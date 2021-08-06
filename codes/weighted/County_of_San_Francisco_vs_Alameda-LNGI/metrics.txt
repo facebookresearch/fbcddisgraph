@@ -1,0 +1,27 @@
+m:
+134094
+n:
+4406
+n[0]:
+3440
+n[1]:
+6415
+lenscale:
+0.016131769706765626
+nout['10']:
+11
+10
+nout['20']:
+21
+22
+nout['100']:
+118
+97
+Kuiper:
+0.0419
+Kolmogorov-Smirnov:
+0.0417
+Kuiper / lenscale:
+2.597
+Kolmogorov-Smirnov / lenscale:
+2.585

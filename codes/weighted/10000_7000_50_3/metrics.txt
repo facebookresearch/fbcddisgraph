@@ -1,0 +1,16 @@
+n:
+6451
+n[0]:
+10000
+n[1]:
+7000
+lenscale:
+0.012573931894562337
+Kuiper:
+0.01472
+Kolmogorov-Smirnov:
+0.01162
+Kuiper / lenscale:
+1.171
+Kolmogorov-Smirnov / lenscale:
+0.9238
