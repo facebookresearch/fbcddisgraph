@@ -166,6 +166,7 @@ of data sets and subpopulations. After identification via the scalar statistics
 of potentially statistically significant deviations in a data set
 for two subpopulations, graphical methods allow for in-depth investigation
 into the variation of the deviations as a function of score.
+
 Indeed, in the topmost plots of Figure~\ref{ex0},
 the deviation between the two subpopulations over a range of scores
 is simply the expected slope of the secant line for the graph
@@ -181,15 +182,28 @@ between the two subpopulations;
 the triangle along the vertical axis on the left of each plot
 indicates the magnitude of the deviation across the full range of scores
 that would be statistically significant at around the 95\% confidence level.
-Detailed explanation of Figure~\ref{ex0} is available
-in Sections~\ref{methods} and~\ref{results} below.
+The connection with statistical significance also motivated related works,
+including that of~\cite{gupta-rahimi-ajanthan-mensink-sminchisescu-hartley}
+and~\cite{roelofs-cain-shlens-mozer}, which offer Kolmogorov-Smirnov metrics
+to help gauge calibration of probabilistic predictions,
+much like in the appendix of~\cite{tygert}.
+Similarly, Section~3.2 of~\cite{gneiting-balabdaoui-raftery} and
+Chapter~8 of~\cite{wilks} propose cumulative reliability diagrams,
+albeit without leveraging the key to the approach of the present paper,
+namely that slope is easy to assess visually even when the constant offset
+of the part of a graph under consideration is arbitrary and uninformative.
+Detailed explanation of statistical significance and Figure~\ref{ex0}
+is available in Sections~\ref{methods} and~\ref{results} below.
 
 Section~\ref{methods} introduces the methodology of cumulative differences,
 both for graphs of the differences and for the scalar metrics
 of Kuiper and of Kolmogorov and Smirnov that summarize the graphs' deviation
 away from being perfectly flat.
 Section~\ref{results} presents several illustrative examples,
-via both simple synthetic and complicated real data sets.
+via both simple synthetic and complicated real data sets.\footnote{Permissively
+licensed open-source software that can automatically reproduce all figures
+and statistics reported below is available at
+\url{https://github.com/facebookresearch/fbcddisgraph}}
 Section~\ref{conclusion} concludes the paper with a brief discussion.
 Table~\ref{notation} summarizes the notation used throughout the present paper.
 
@@ -832,7 +846,10 @@ for setting the bins.
 This section illustrates via numerous examples
 the previous section's methods, including comparisons
 with the canonical plots --- the ``reliability diagrams'' ---
-discussed in the introduction.
+discussed in the introduction.\footnote{Permissively licensed open-source
+software that can automatically reproduce all figures and statistics reported
+in the present paper is available at
+\url{https://github.com/facebookresearch/fbcddisgraph}}
 Subsection~\ref{synthetic} presents several synthetic examples.
 Subsection~\ref{imagenetex} gives examples
 from a popular, unweighted data set of images, ImageNet.
@@ -1151,8 +1168,6 @@ The captions of the figures comment on the numerical results displayed.
 \label{ex3}
 \end{figure}
 
-
-\clearpage
 
 
 \subsection{ImageNet}
@@ -1660,8 +1675,6 @@ the figure & the first subpop. & the second subpop. \\\hline
 \label{Riverside-Butte}
 \end{figure}
 
-
-\clearpage
 
 
 \subsection{Cautions}
