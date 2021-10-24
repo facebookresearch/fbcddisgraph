@@ -40,8 +40,10 @@
 
 
 
-\title{Cumulative differences between subpopulations}
-\author{Mark Tygert}
+\title{A graphical method of cumulative differences\\between two subpopulations}
+\author{Mark Tygert\\{\normalsize Facebook Artificial Intelligence Research}\\
+{\normalsize 1 Facebook Way, Menlo Park, CA 94025}\\
+{\normalsize Main e-mail address:\ \ {\tt mark\symbol{64}tygert.com}}}
 
 
 
@@ -78,6 +80,12 @@ The present paper develops such cumulative methods
 for the common case in which no score of any member
 of the subpopulations being compared is exactly equal to the score
 of any other member of either subpopulation.
+
+\bigskip
+
+\noindent {\bf Keywords:} calibration, fairness, equity, forecast,
+prediction, stochastic, reliability diagram, histogram, plot, visualization
+
 \end{abstract}
 
 
@@ -94,8 +102,8 @@ Propensity scores are a popular method for matching,
 as are the likelihoods assigned by statistical or machine-learned models.
 Synonyms for ``outcome'' include ``response'' and ``result,''
 and the present paper will use all these synonyms interchangeably.
-The responses are random variables, whereas the scores are viewed as given,
-non-random.
+The responses are {\it random} variables,
+whereas the scores are viewed as given, non-random.
 In many practical settings, no score from among either subpopulation's members
 is exactly equal to any score from among the two subpopulations' other members,
 complicating the comparison and very concept of ``matching'';
@@ -152,10 +160,13 @@ for enhanced resolution in detecting deviations as a function of score;
 after all, narrower bins perform less averaging, averaging away less
 of the randomness in the observations.
 The trade-off between resolution and statistical confidence
-is inherent in methods based on binning or kernel density estimation.
+is inherent in methods based on binning or kernel density estimation
+such as that of~\cite{srihera-stute}.
 The methods proposed in the present paper avoid making
 such an explicit trade-off and also avoid the rather arbitrary decisions
 about which bins or kernels to use.
+The present paper extensively compares its methods against
+both standard choices of bins for the classical methods.
 
 The present paper follows the cumulative approach introduced into statistics
 by~\cite{kolmogorov} and~\cite{smirnov}.
@@ -166,8 +177,23 @@ of data sets and subpopulations. After identification via the scalar statistics
 of potentially statistically significant deviations in a data set
 for two subpopulations, graphical methods allow for in-depth investigation
 into the variation of the deviations as a function of score.
+The graphical methods (and hence an intuitive interpretation
+of the associated scalar summary statistics) rely on the weighting
+used by~\cite{delgado}, \cite{diebolt}, and~\cite{stute},
+which is different from the weighting used by the otherwise
+closely related approach of~\cite{scheike} and the others
+cited by~\cite{gonzalez-manteiga-crujeiras}.
+The scalar summary statistics of~\cite{delgado} are almost the same
+as those in the present paper, but for the simpler setting in which each score
+comes with precisely one observation from one subpopulation
+and one observation from the other subpopulation.
+The scalar summary statistics of~\cite{diebolt} and~\cite{stute} are analogues
+of those from the appendix of~\cite{tygert}
+in the special case that the parametric regression function they consider
+is nothing but the identity function on the unit interval $[0, 1]$.
 
-Indeed, in the topmost plots of Figure~\ref{ex0},
+The graphs introduced in the present paper are easy to interpret.
+For instance, in the topmost plots (a and b) of Figure~\ref{ex0},
 the deviation between the two subpopulations over a range of scores
 is simply the expected slope of the secant line for the graph
 over that range of scores, as a function of the index $k/n$
@@ -206,47 +232,58 @@ and statistics reported below is available at
 \url{https://github.com/facebookresearch/fbcddisgraph}}
 Section~\ref{conclusion} concludes the paper with a brief discussion.
 Table~\ref{notation} summarizes the notation used throughout the present paper.
+Readers interested mainly in seeing results and comparisons
+of the proposed methods to the old standbys may wish to start
+with Section~\ref{results}.
 
 
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_0/cumulative.pdf}}
 \quad\quad
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_0/cumulative_exact.pdf}}
 
 \vspace{\vertsep}
 
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_0/equisamps.pdf}}
 \quad\quad
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_0/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_0/equisamps.pdf}}
 \quad\quad
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_0/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_0/exact.pdf}}
 
 \end{centering}
 \caption{$n =$ 6,451; Kuiper's statistic is $0.09740 / \sigma = 7.823$,
          Kolmogorov's and Smirnov's is $0.09724 / \sigma = 7.810$;
-         the reliability diagrams with only 10 bins each smooth out the jumps
-         at high scores, and while the reliability diagrams with 50 bins each
-         give some indication of the jumps, the jumps still get smoothed over,
-         while the bins for lower scores are too narrow to average away noise
-         well. The cumulative graph (in the topmost row) clearly displays
-         the jumps, while remaining easily interpretable at lower scores.
+         the reliability diagrams with only 10 bins each (c and d) smooth out
+         the jumps at high scores, and while the reliability diagrams
+         with 50 bins each (e and f) give some indication of the jumps,
+         the jumps still get smoothed over, while the bins for lower scores are
+         too narrow to average away noise well. The cumulative graph (a)
+         clearly displays the jumps, while remaining easily interpretable
+         at lower scores.
          The statistics of Kuiper and of Kolmogorov and Smirnov are both
          several times greater than $\sigma$,
          so both reflect that the deviation displayed in the graphs
@@ -260,6 +297,7 @@ Table~\ref{notation} summarizes the notation used throughout the present paper.
 \caption{Notational conventions
 (The symbols in the table are in alphabetical order.)}
 \label{notation}
+\vspace{-.5em}
 \begin{center}
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llll}
@@ -312,7 +350,7 @@ for the second stage, in the simplest case of unweighted sampling.
 Subsection~\ref{scalarstats} then collapses the graphs
 of Subsection~\ref{unweighted} into scalar statistics
 useful for the first, broad-brush stage.
-Subsection~\ref{significance} explains how to measure statistical significance.
+Subsection~\ref{significance} explains how to gauge statistical significance.
 Finally, Subsection~\ref{weighted} treats the case of weighted sampling,
 generalizing the previous subsections to the more complicated case
 of data with weights.
@@ -360,14 +398,17 @@ the previous subsection outlines a strategy for handling multiple data sets
 and pairs of subpopulations, based on the processing of individual cases.
 The data being considered should be observations of independent responses,
 with each response taking one of finitely many real-valued possibilities,
-and with each response being paired with a real-valued score
+and with each (random) response being paired with a real-valued score
+viewed as given not random
 (the responses across the different scores should be independent).
 Hence, the scores can take on any real values,
 whereas the responses should be drawn from discrete distributions.
 {\it In the present paper, the scores from the observations
 in both subpopulations put together must be distinct
 --- the score for every observation from either subpopulation must be unique
-or else slightly perturbed to become different from all the other scores.}
+or else slightly perturbed to become different from all the other scores
+(perturbing as little as possible while accounting for roundoff,
+for instance).}
 
 Under this assumption of uniqueness, a graphical method for analyzing
 deviation between the outcomes of the two subpopulations as a function
@@ -466,7 +507,7 @@ Figure~\ref{ex0} presents a synthetic example
 from Subsection~\ref{synthetic} below for which the ground-truth
 is known explicitly.
 In accord with~(\ref{fundamental}),
-the topmost plots of Figure~\ref{ex0}
+the topmost plots (a and b) of Figure~\ref{ex0}
 display deviation between the two subpopulations over a range of scores
 as the expected slope of the secant line for the graph
 over that range of scores, as a function of the index $k/n$
@@ -654,8 +695,11 @@ deviates from zero by roughly $1/\sqrt{n}$.
 Identification of deviation between the two subpopulations
 is reliable when focusing on long ranges of steep slopes
 (as a function of $k/n$) for $C_k$; the triangle gives a sense
-of the length scale for stochastic variations that occur
-even when there is no underlying deviation between the subpopulations.
+of the length scale for the largest stochastic variations that
+are likely to happen even when there is no underlying deviation
+between the subpopulations. The remainder of the present subsection
+derives this conservative upper bound on the length scale
+in cases for which the value of every observed response is either 0 or 1.
 
 The long-range deviations of $C_0$, $C_1$, $C_2$, \dots, $C_n$ from zero
 can be biased even when the two subpopulations are drawn
@@ -705,6 +749,12 @@ due to the dependency between the even- and odd-indexed entries
 in the sequence of second-order differences from~(\ref{diff_even})
 and~(\ref{diff_odd}), and a factor of $\sqrt{2}$ to account
 for having 2 independently drawn subpopulations.
+Needless to say, the upper bound of $4\sigma$ is often somewhat loose
+in practice, as the two assumptions discussed in the previous paragraph
+yield rather conservative guarantees.
+Tighter bounds may exist in settings for which the scores are drawn
+from a specified probability distribution
+(unlike in the setting of the present paper).
 
 
 \subsection{Weighted sampling}
@@ -902,7 +952,7 @@ Displaying the bin frequencies is another way to indicate uncertainties,
 as suggested, for example, by~\cite{murphy-winkler}.
 Still other possibilities for uncertainty quantification could use
 kernel density estimation, as suggested, for example,
-by~\cite{brocker} and~\cite{wilks}.
+by~\cite{brocker}, \cite{srihera-stute}, and~\cite{wilks}.
 Such uncertainty estimates involve setting widths for the bins
 or kernel smoothing; such settings are fairly arbitrary
 and actually unnecessary when varying the widths as in the plots
@@ -1032,30 +1082,37 @@ The captions of the figures comment on the numerical results displayed.
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_1/cumulative.pdf}}
 \quad\quad
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_1/cumulative_exact.pdf}}
 
 \vspace{\vertsep}
 
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_1/equisamps.pdf}}
 \quad\quad
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_1/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_1/equisamps.pdf}}
 \quad\quad
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_1/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_1/exact.pdf}}
 
@@ -1064,8 +1121,8 @@ The captions of the figures comment on the numerical results displayed.
          Kolmogorov's and Smirnov's is $0.1531 / \sigma = 11.32$;
          the reliability diagrams all have trouble resolving the sharp behavior
          corresponding to the relatively sharp corners in the cumulative graphs
-         (though the reliability diagram with 50 bins that has an equal number
-         of subpopulation scores per bin is decent).
+         (a and b), though the reliability diagram with 50 bins that
+         has an equal number of subpopulation scores per bin (e) is decent.
          The metrics of Kuiper and of Kolmogorov and Smirnov
          report extremely statistically significant deviation,
          taking values of many times $\sigma$.
@@ -1077,42 +1134,49 @@ The captions of the figures comment on the numerical results displayed.
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_2/cumulative.pdf}}
 \quad\quad
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_2/cumulative_exact.pdf}}
 
 \vspace{\vertsep}
 
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_2/equisamps.pdf}}
 \quad\quad
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_2/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_2/equisamps.pdf}}
 \quad\quad
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_2/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_2/exact.pdf}}
 
 \end{centering}
 \caption{$n =$ 6,637; Kuiper's statistic is $0.2730 / \sigma = 22.24$,
          Kolmogorov's and Smirnov's is $0.2730 / \sigma = 22.24$;
-         the reliability diagrams with 10 bins each smooth the black curve
-         too much, while the reliability diagrams with 50 bins each display
-         overly noisy variations in the gray curve.
-         The empirical cumulative graph matches its ground-truth expectations
-         well, though the oscillations at low scores are a bit hard to discern
-         in the cumulative graphs.
+         the reliability diagrams with 10 bins each (c and d) smooth
+         the black curve too much, while the reliability diagrams
+         with 50 bins each (e and f) display overly noisy variations
+         in the gray curve. The empirical cumulative graph (a) matches
+         its ground-truth expectations (b) well, though the oscillations
+         at low scores are a bit hard to discern in the cumulative graphs.
          The metrics of Kuiper and of Kolmogorov and Smirnov
          report profoundly statistically significant deviation,
          taking values many times larger than $\sigma$.
@@ -1124,37 +1188,44 @@ The captions of the figures comment on the numerical results displayed.
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_3/cumulative.pdf}}
 \quad\quad
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_3/cumulative_exact.pdf}}
 
 \vspace{\vertsep}
 
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_3/equisamps.pdf}}
 \quad\quad
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_3/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_3/equisamps.pdf}}
 \quad\quad
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_50_3/equiscore.pdf}}
 
 \vspace{\vertsep}
 
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/10000_7000_10_3/exact.pdf}}
 
 \end{centering}
 \caption{$n =$ 6,451; Kuiper's statistic is $0.01429 / \sigma = 1.148$,
          Kolmogorov's and Smirnov's is $0.01046 / \sigma = 0.8402$;
-         the stochastic variations in the empirical cumulative graph
+         the stochastic variations in the empirical cumulative graph (a)
          are clearly within the expectations indicated by the triangle
          at the origin --- the graph looks like a perfectly random walk,
          and indeed really is a drift-free, perfectly random walk.
@@ -1201,33 +1272,44 @@ for the subpopulations and then compare the different kinds of plots.
 
 
 
+\clearpage
+
+
+
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatus.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatusequisamps10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatusequiscore10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatusequisamps30.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatusequiscore30.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatusequisamps50.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-248-Eskimo-dog-husky_293-cheetah-chetah-Acinonyx-jubatusequiscore50.pdf}}
 
@@ -1236,7 +1318,7 @@ for the subpopulations and then compare the different kinds of plots.
          Kuiper's statistic is $0.3738 / \sigma = 7.974$,
          Kolmogorov's and Smirnov's is $0.3738 / \sigma = 7.974$;
          in this case, the reliability diagrams with many bins can resolve
-         the phenomena displayed in the graph of cumulative differences,
+         the phenomena displayed in the graph of cumulative differences (a),
          but only by sacrificing confidence in their estimates,
          as they exhibit wild fluctuations.
          The metrics of Kuiper and of Kolmogorov and Smirnov both report
@@ -1250,30 +1332,37 @@ for the subpopulations and then compare the different kinds of plots.
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippusequisamps10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippusequiscore10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippusequisamps30.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippusequiscore30.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippusequisamps50.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-60-night-snake-Hypsiglena-torquata_323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippusequiscore50.pdf}}
 
@@ -1283,13 +1372,13 @@ for the subpopulations and then compare the different kinds of plots.
          Kuiper's statistic is $0.3138 / \sigma = 5.471$,
          Kolmogorov's and Smirnov's is $0.3138 / \sigma = 5.471$;
          the lack of deviation at large scores is hard to detect
-         without 30 bins or more, but then the reliability diagrams
-         are too noisy for other scores. Moreover, the diagrams
-         with only 10 or 30 bins smooth away the extreme deviation
-         for the lowest scores. The graph of cumulative differences
-         captures all phenomena nicely simultaneously.
-         The statistics of Kuiper and of Kolmogorov and Smirnov both report
-         very highly statistically significant deviations
+         without 30 bins or more (d, e, f, and g),
+         but then the reliability diagrams are too noisy for other scores.
+         Moreover, the diagrams with only 10 or 30 bins (b, c, d, and e)
+         smooth away the extreme deviation for the lowest scores.
+         The graph of cumulative differences (a) captures all phenomena nicely
+         simultaneously. The statistics of Kuiper and of Kolmogorov and Smirnov
+         both report very highly statistically significant deviations
          between the subpopulations.
 }
 \label{night-snake_monarch-butterfly}
@@ -1299,30 +1388,37 @@ for the subpopulations and then compare the different kinds of plots.
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofa.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofaequisamps10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofaequiscore10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofaequisamps30.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofaequiscore30.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofaequisamps50.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/unweighted/nll-1-323-monarch-monarch-butterfly-milkweed-butterfly-Danaus-plexippus_342-wild-boar-boar-Sus-scrofaequiscore50.pdf}}
 
@@ -1331,11 +1427,11 @@ for the subpopulations and then compare the different kinds of plots.
          Wild boar (Sus scrofa); $n =$ 315;
          Kuiper's statistic is $0.1292 / \sigma = 2.294$,
          Kolmogorov's and Smirnov's is $0.1292 / \sigma = 2.294$;
-         the reliability diagrams with 30 bins or less
+         the reliability diagrams with 30 bins or less (b, c, d, and e)
          underestimate (or fail to resolve) the extreme deviation
-         at the lowest scores, whereas the diagrams with 50 bins
+         at the lowest scores, whereas the diagrams with 50 bins (f and g)
          are far too noisy for the other scores.
-         The graph of cumulative differences resolves
+         The graph of cumulative differences (a) resolves
          all these behaviors clearly.
          The metrics of Kuiper and of Kolmogorov and Smirnov both report
          somewhat statistically significant deviations
@@ -1402,36 +1498,46 @@ the figure & the first subpop. & the second subpop. \\\hline
 \hline
 \end{tabular}
 \end{center}
+%
+\vspace{-1.5em}
+%
 \end{table}
 
 
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/cumulative.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/equierrs10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/equiscores10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/equierrs20.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/equiscores20.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/equierrs100.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Alameda_vs_Placer-LNGI/equiscores100.pdf}}
 
@@ -1440,10 +1546,11 @@ the figure & the first subpop. & the second subpop. \\\hline
          Kuiper's statistic is $0.05192 / \sigma = 2.450$,
          Kolmogorov's and Smirnov's is $0.05192 / \sigma = 2.450$;
          the behavior for small scores is interesting,
-         as the cumulative graph shows a big spike at the very lowest scores
-         and then a very flat part, and only the reliability diagrams
-         with 100 bins reflect those. Yet the latter reliability diagrams
-         are very, very noisy for the other scores. 
+         as the cumulative graph (a) shows a big spike
+         at the very lowest scores and then a very flat part, and
+         only the reliability diagrams with 100 bins (f and g) reflect those.
+         Yet the latter reliability diagrams are very, very noisy
+         for the other scores. 
          The metrics of Kuiper and of Kolmogorov and Smirnov report
          mildly statistically significant deviation between the subpopulations.
 }
@@ -1454,30 +1561,37 @@ the figure & the first subpop. & the second subpop. \\\hline
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/cumulative.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/equierrs10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/equiscores10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/equierrs20.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/equiscores20.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/equierrs100.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Kern-LNGI/equiscores100.pdf}}
 
@@ -1485,10 +1599,11 @@ the figure & the first subpop. & the second subpop. \\\hline
 \caption{San Francisco County vs.\ Kern County; $n =$ 2,260;
          Kuiper's statistic is $0.07882 / \sigma = 3.454$,
          Kolmogorov's and Smirnov's is $0.07863 / \sigma = 3.445$;
-         only the cumulative graph and the reliability diagrams with 100 bins
-         resolve both the extreme deviation for many low scores
-         and the relatively small deviation for the very lowest scores,
-         whereas 100 bins produce far too much noise for most scores.
+         only the cumulative graph (a) and the reliability diagrams
+         with 100 bins (f and g) resolve both the extreme deviation
+         for many low scores and the relatively small deviation
+         for the very lowest scores, whereas 100 bins (f and g) produce
+         far too much noise for most scores.
          The statistics of Kuiper and of Kolmogorov and Smirnov report
          statistically significant deviation between the subpopulations.
 }
@@ -1499,30 +1614,37 @@ the figure & the first subpop. & the second subpop. \\\hline
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/cumulative.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/equierrs10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/equiscores10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/equierrs20.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/equiscores20.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/equierrs100.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_Contra_Costa-LNGI/equiscores100.pdf}}
 
@@ -1530,9 +1652,9 @@ the figure & the first subpop. & the second subpop. \\\hline
 \caption{San Francisco County vs.\ Contra Costa County; $n =$ 3,407;
          Kuiper's statistic is $0.06395 / \sigma = 3.488$,
          Kolmogorov's and Smirnov's is $0.06395 / \sigma = 3.488$;
-         only the cumulative graph fully captures the relatively small
+         only the cumulative graph (a) fully captures the relatively small
          deviation for the very lowest scores, and having even just 100 bins
-         in a reliability diagram already produces far too much noise
+         in a reliability diagram (f and g) already produces far too much noise
          for most scores.
          The metrics of Kuiper and of Kolmogorov and Smirnov report
          statistically significant deviation between the subpopulations.
@@ -1544,30 +1666,37 @@ the figure & the first subpop. & the second subpop. \\\hline
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/cumulative.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/equierrs10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/equiscores10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/equierrs20.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/equiscores20.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/equierrs100.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Joaquin-LNGI/equiscores100.pdf}}
 
@@ -1575,9 +1704,9 @@ the figure & the first subpop. & the second subpop. \\\hline
 \caption{San Francisco County vs.\ San Joaquin County; $n =$ 2,358;
          Kuiper's statistic is $0.06160 / \sigma = 2.794$,
          Kolmogorov's and Smirnov's is $0.06025 / \sigma = 2.733$;
-         only the cumulative graph and the otherwise extremely noisy
-         reliability diagrams each with 100 bins fully detail the sharp spike
-         at scores just slightly greater than 4.
+         only the cumulative graph (a) and the otherwise extremely noisy
+         reliability diagrams each with 100 bins (f and g) fully detail
+         the sharp spike at scores just slightly greater than 4.
          The metrics of Kuiper and of Kolmogorov and Smirnov report
          some statistically significant deviation between the subpopulations.
 }
@@ -1588,30 +1717,37 @@ the figure & the first subpop. & the second subpop. \\\hline
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/cumulative.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/equierrs10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/equiscores10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/equierrs20.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/equiscores20.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/equierrs100.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_San_Francisco_vs_San_Mateo-LNGI/equiscores100.pdf}}
 
@@ -1620,8 +1756,8 @@ the figure & the first subpop. & the second subpop. \\\hline
          Kuiper's statistic is $0.03688 / \sigma = 1.923$,
          Kolmogorov's and Smirnov's is $0.03631 / \sigma = 1.893$;
          resolving the full extent of the spike
-         at some of the lowest scores in the cumulative graph requires
-         at least 100 bins in the reliability diagrams,
+         at some of the lowest scores in the cumulative graph (a) requires
+         at least 100 bins in the reliability diagrams (f and g),
          but then the reliability diagrams are too noisy at the other scores.
          The statistics of Kuiper and of Kolmogorov and Smirnov do not report
          very statistically significant deviation between the subpopulations.
@@ -1633,30 +1769,37 @@ the figure & the first subpop. & the second subpop. \\\hline
 \begin{figure}
 \begin{centering}
 
+(a)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/cumulative.pdf}}
 
 \vspace{\vertsep}
 
+(b)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/equierrs10.pdf}}
 \quad\quad
+(c)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/equiscores10.pdf}}
 
 \vspace{\vertsep}
 
+(d)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/equierrs20.pdf}}
 \quad\quad
+(e)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/equiscores20.pdf}}
 
 \vspace{\vertsep}
 
+(f)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/equierrs100.pdf}}
 \quad\quad
+(g)
 \parbox{\imsize}{\includegraphics[width=\imsize]
 {../codes/weighted/County_of_Riverside_vs_Butte-LNGI/equiscores100.pdf}}
 
@@ -1666,9 +1809,9 @@ the figure & the first subpop. & the second subpop. \\\hline
          Kolmogorov's and Smirnov's is $0.04624 / \sigma = 1.650$;
          resolving both the phenomena corresponding to the fairly flat part
          and the phenomena corresponding to the very steep part
-         of the cumulative graph for the lowest scores requires
-         at least 100 bins in the reliability diagrams, but then the rest
-         of the diagrams is very noisy.
+         of the cumulative graph (a) for the lowest scores requires
+         at least 100 bins in the reliability diagrams (f and g),
+         but then the rest of the diagrams is very noisy.
          The statistics of Kuiper and of Kolmogorov and Smirnov do not report
          much statistically significant deviation between the subpopulations.
 }
@@ -1735,17 +1878,6 @@ across the full range of scores in the plots.
 The graphs of cumulative differences avoid explicitly making
 a trade-off between statistical confidence and resolution as a function
 of score --- a trade-off that is inherent to the traditional binned diagrams.
-
-
-
-\section*{Acknowledgements}
-
-We would like to thank Imanol Arrieta Ibarra and Mike Rabbat
-for stimulating and supporting this work.
-
-
-
-\newpage
 
 
 

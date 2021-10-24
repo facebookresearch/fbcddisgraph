@@ -1,6 +1,7 @@
 The accompanying codes reproduce all figures and statistics presented in
-"Cumulative differences between subpopulations" by Mark Tygert. This repository
-also provides the LaTeX and BibTeX sources required for replicating the paper.
+"A graphical method of cumulative differences between two subpopulations"
+by Mark Tygert. This repository also provides the LaTeX and BibTeX sources
+required for replicating the paper.
 
 The main files in the repository are the following:
 
