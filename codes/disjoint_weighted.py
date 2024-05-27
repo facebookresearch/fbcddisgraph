@@ -309,8 +309,7 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
     plt.xlabel(
         '$k/n$ (together with minor ticks at equispaced values of $A_k$)')
     ax2.tick_params(which='minor', axis='x', top=True, direction='in', pad=-17)
-    ax2.set_xticks(np.arange(0, 1 + 1 / majorticks, 1 / majorticks),
-                   minor=True)
+    ax2.set_xticks(np.arange(1 / majorticks, 1, 1 / majorticks), minor=True)
     ks = ['{:.2f}'.format(x) for x in
           np.arange(0, 1 + 1 / majorticks, 1 / majorticks).tolist()]
     alist = np.arange(0, 1 + 1 / majorticks, 1 / majorticks)
@@ -320,13 +319,13 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
     alabs = []
     for x in alist:
         multiple = abscissae[int(x)] * majorticks
-        if abs(multiple - round(multiple)) > 1e-4:
+        if abs(multiple - round(multiple)) > 1e-3:
             alabs.append(abscissae[int(x)])
         else:
-            alabs.append(abscissae[int(x)] * (1 - 1e-4))
+            alabs.append(abscissae[int(x)] * (1 + 1e-3))
     plt.xticks(alabs, ks)
     ax2.xaxis.set_minor_formatter(FixedFormatter(
-        [''] + [r'$A_k\!=\!{:.2f}$'.format(1 / majorticks)]
+        [r'$A_k\!=\!{:.2f}$'.format(1 / majorticks)]
         + [r'${:.2f}$'.format(k / majorticks) for k in range(2, majorticks)]))
     # Title the plot.
     plt.title(title)
