@@ -319,7 +319,7 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
     alabs = []
     for x in alist:
         multiple = abscissae[int(x)] * majorticks
-        if abs(multiple - round(multiple)) > 1e-3:
+        if abs(multiple - round(multiple)) > multiple * 1e-3 / 2:
             alabs.append(abscissae[int(x)])
         else:
             alabs.append(abscissae[int(x)] * (1 + 1e-3))
