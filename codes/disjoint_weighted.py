@@ -190,7 +190,7 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
     if weights is None:
         w = []
         for j in range(2):
-            w.append(np.ones((n[j])))
+            w.append(np.ones((len(s[j]))))
     else:
         w = weights.copy()
     for j in range(2):
