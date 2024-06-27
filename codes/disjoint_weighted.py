@@ -72,7 +72,7 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
         title of the plot
     fraction : float, optional
         proportion of the full horizontal axis to display
-    weights : list
+    weights : list, optional
         list of array_like weights of the observations
         (the default None results in equal weighting)
 
@@ -360,7 +360,7 @@ def equiscores(r, s, nbins, filename='equiscores.pdf', weights=None,
         number of bins
     filename : string, optional
         name of the file in which to save the plot
-    weights : list
+    weights : list, optional
         list of array_like weights of the observations
         (the default None results in equal weighting)
     top : float, optional
@@ -462,7 +462,7 @@ def equierrs(r, s, nbins, filename='equierrs.pdf', weights=None,
         number of bins
     filename : string, optional
         name of the file in which to save the plot
-    weights : list
+    weights : list, optional
         list of array_like weights of the observations
         (the default None results in equal weighting)
     top : float, optional
