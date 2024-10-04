@@ -20,6 +20,8 @@ equierrs
     Reliability diagram with similar ratio L2-norm / L1-norm of weights by bin
 exactplot
     Reliability diagram with exact values plotted
+ate
+    Alternative weighted average treatment effect between two subpopulations
 
 This source code is licensed under the MIT license found in the LICENSE file in
 the root directory of this source tree.
@@ -29,8 +31,8 @@ the root directory of this source tree.
 import math
 import os
 import subprocess
-import random
 import numpy as np
+from numpy.random import default_rng
 import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
@@ -63,9 +65,8 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
         number of minor ticks on the lower axis
     probs : bool, optional
         set to True if the scores are the probabilities of success
-        for Bernoulli variates; set to False (the default) to bound
-        the variance of a Bernoulli variate by p(1-p) <= 1/4, as appropriate
-        when p is unknown
+        for Bernoulli variates; set to False (the default) to use
+        empirical estimates that are valid for all distributions
     filename : string, optional
         name of the file in which to save the plot
     title : string, optional
@@ -275,7 +276,14 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
     if probs:
         lenscale = np.sqrt(np.sum(w01sub**2 * t01sub * (1 - t01sub)))
     else:
-        lenscale = np.sqrt(np.sum(w01sub**2 / 4))
+        aaa = a[:int(len(a) * fraction)]
+        aaa = aaa[1:] - aaa[:-1]
+        wa = w01sub[1:] + w01sub[:-1]
+        # The division by 16 in the following expression compensates
+        # for multiplication by 4 in the following lines, as well as
+        # for the squaring of doubled weights (wa is roughly twice
+        # the original weights).
+        lenscale = np.sqrt(np.sum(np.square(aaa) * np.square(wa)) / 16)
     # Adjust lenscale for the dependence between even and odd entries of t01.
     lenscale *= math.sqrt(2)
     # Adjust lenscale for taking the difference of 2 independent distributions
@@ -294,7 +302,7 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
         '{:.2f}'.format(x)
         for x in t01sub[::(len(t01sub) // majorticks)].tolist()]
     plt.xticks(abscissae[:len(abscissae):(len(abscissae) // majorticks)][
-        :majorticks], sl[:majorticks])
+        :majorticks], sl[:majorticks], bbox=dict(boxstyle='Round', fc='w'))
     if len(t01sub) >= 300 and minorticks >= 50:
         # Indicate the distribution of t01 via unlabeled minor ticks.
         plt.minorticks_on()
@@ -303,11 +311,12 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
         ax.set_xticks(np.insert(abscissae, 0, [0])[
             np.cumsum(histcounts(minorticks, t01sub))], minor=True)
     # Label the axes.
-    plt.xlabel('score ($S^0_{(k-1)/2}$ or $S^1_{(k-2)/2}$)')
+    plt.xlabel('score ($S^0_{(k-1)/2}$ or $S^1_{(k-2)/2}$)', labelpad=6)
     plt.ylabel('$C_k$')
     ax2 = plt.twiny()
     plt.xlabel(
-        '$k/n$ (together with minor ticks at equispaced values of $A_k$)')
+        '$k/n$ (together with minor ticks at equispaced values of $A_k$)',
+        labelpad=8)
     ax2.tick_params(which='minor', axis='x', top=True, direction='in', pad=-17)
     ax2.set_xticks(np.arange(1 / majorticks, 1, 1 / majorticks), minor=True)
     ks = ['{:.2f}'.format(x) for x in
@@ -323,7 +332,7 @@ def cumulative(r, s, majorticks, minorticks, probs=False,
             alabs.append(abscissae[int(x)])
         else:
             alabs.append(abscissae[int(x)] * (1 + 1e-3))
-    plt.xticks(alabs, ks)
+    plt.xticks(alabs, ks, bbox=dict(boxstyle='Round', fc='w'))
     ax2.xaxis.set_minor_formatter(FixedFormatter(
         [r'$A_k\!=\!{:.2f}$'.format(1 / majorticks)]
         + [r'${:.2f}$'.format(k / majorticks) for k in range(2, majorticks)]))
@@ -439,7 +448,7 @@ def equiscores(r, s, nbins, filename='equiscores.pdf', weights=None,
     plt.close()
 
 
-def equierrs(r, s, nbins, filename='equierrs.pdf', weights=None,
+def equierrs(r, s, nbins, rng, filename='equierrs.pdf', weights=None,
              top=None, left=None, right=None):
     """
     Reliability diagram with similar ratio L2-norm / L1-norm of weights by bin
@@ -460,6 +469,8 @@ def equierrs(r, s, nbins, filename='equierrs.pdf', weights=None,
         list of array_like scores (each array must be in non-decreasing order)
     nbins : int
         number of bins
+    rng : Generator
+        fully initialized random number generator from NumPy
     filename : string, optional
         name of the file in which to save the plot
     weights : list, optional
@@ -499,7 +510,7 @@ def equierrs(r, s, nbins, filename='equierrs.pdf', weights=None,
         # of the L2 norm of w in the bin to the L1 norm of w in the bin,
         # returning the indices defining the bins in the list inbin.
         proxy = len(w) // nbins
-        v = w[np.sort(np.random.permutation(len(w))[:proxy])]
+        v = w[np.sort(rng.permutation(len(w))[:proxy])]
         # t is a heuristic threshold.
         t = np.square(v).sum() / v.sum()**2
         inbin = []
@@ -616,6 +627,107 @@ def exactplot(r, s, filename='exact.pdf', title='exact expectations',
     plt.close()
 
 
+def ate(r, s, rng, weights=None, num_rand=4):
+    """
+    Alternative weighted average treatment effect between two subpopulations.
+
+    Estimates the weighted average treatment effect between two subpopulations,
+    without making any assumptions about their scores. Steps through the scores
+    in non-descending order, averaging the difference between each response
+    from one of the subpopulations and the two responses from the other
+    subpopulation at the nearest scores to the left and right that correspond
+    to the other subpopulation (the scores are not required to be unique).
+    Returns the average of this quantity and the analogue for the other
+    subpopulation. Averages the result over num_rand random permutations of the
+    scores prior to the sorting of the scores (so that any ties get broken at
+    random).
+
+    Parameters
+    ----------
+    r : list
+        list of array_like values of random outcomes
+    s : list
+        list of array_like scores
+    rng : Generator
+        fully initialized random number generator from NumPy
+    weights : list, optional
+        list of array_like weights of the observations
+        (the default None results in equal weighting)
+    num_rand : int, optional
+        number of times to permute the scores at random prior to sorting
+
+    Returns
+    -------
+    float
+        weighted average treatment effect
+    """
+    # Determine the weighting scheme.
+    if weights is None:
+        w = []
+        for j in range(2):
+            w.append(np.ones((len(s[j]))))
+    else:
+        w = weights.copy()
+    for j in range(2):
+        w[j] /= w[j].sum()
+    # Combine the scores, responses, weights, and subpopulation indicators into
+    # longer arrays.
+    s2 = np.concatenate((np.ravel(s[0]), np.ravel(s[1])))
+    r2 = np.concatenate((np.ravel(r[0]), np.ravel(r[1])))
+    w2 = np.concatenate((np.ravel(w[0]), np.ravel(w[1])))
+    ispop = np.concatenate(
+        (np.zeros(shape=(r[0].size)), np.ones(shape=(r[1].size))))
+    # Average over several random permutations.
+    ates = []
+    for _ in range(num_rand):
+        # Permute the arrays at random.
+        perm = rng.permutation((len(s2)))
+        s2 = s2[perm]
+        r2 = r2[perm]
+        w2 = w2[perm]
+        ispop = ispop[perm]
+        # Sort the scores and rearrange the other arrays accordingly.
+        perm = np.argsort(s2, kind='stable')
+        s2 = s2[perm]
+        r2 = r2[perm]
+        w2 = w2[perm]
+        ispop = ispop[perm]
+        # Step through the scores for each subpopulation.
+        wate = 0
+        for j in range(len(r2)):
+            # Look left.
+            k = j
+            while k >= 0 and ispop[k] == ispop[j]:
+                k -= 1
+            if k >= 0:
+                left = True
+                diff0 = r2[k] - r2[j]
+                if ispop[j] == 0:
+                    diff0 = -diff0
+            else:
+                left = False
+                diff0 = 0
+            # Look right.
+            k = j
+            while k < len(r2) and ispop[k] == ispop[j]:
+                k += 1
+            if k < len(r2):
+                right = True
+                diff1 = r2[k] - r2[j]
+                if ispop[j] == 0:
+                    diff1 = -diff1
+            else:
+                right = False
+                diff1 = 0
+            if left and right:
+                wate += (diff0 + diff1) * w2[j] / 2
+            else:
+                wate += (diff0 + diff1) * w2[j]
+        # Compensate for the fact that np.sum(w2) = 2.
+        ates.append(wate / 2)
+    return sum(ates) / len(ates)
+
+
 if __name__ == '__main__':
     #
     # Generate directories with plots as specified via the code below,
@@ -639,10 +751,10 @@ if __name__ == '__main__':
 
             if iex == 0:
                 # Construct scores for the subpopulations.
-                np.random.seed(987654321)
+                rng = default_rng(seed=987654321)
                 s = []
                 for j in range(2):
-                    s.append(np.random.uniform(size=(n[j])))
+                    s.append(rng.uniform(size=(n[j])))
                     if j == 1:
                         s[j] = (1 + (s[j] - .5)**3 / .5**3) / 2
                     else:
@@ -679,10 +791,10 @@ if __name__ == '__main__':
 
             if iex == 1:
                 # Construct scores for the subpopulations.
-                np.random.seed(987654321)
+                rng = default_rng(seed=987654321)
                 s = []
                 for j in range(2):
-                    s.append(np.random.uniform(size=(n[j])))
+                    s.append(rng.uniform(size=(n[j])))
                     if j == 0:
                         s[j] = s[j] ** 5
                     # The scores must be in increasing order.
@@ -705,10 +817,10 @@ if __name__ == '__main__':
 
             if iex == 2:
                 # Construct scores for the subpopulations.
-                np.random.seed(987654321)
+                rng = default_rng(seed=987654321)
                 s = []
                 for j in range(2):
-                    s.append(np.random.uniform(size=(n[j])))
+                    s.append(rng.uniform(size=(n[j])))
                     if j == 1:
                         s[j] = 1 + np.cbrt(s[j] - .5) / np.cbrt(.5)
                         s[j] /= 2
@@ -718,7 +830,7 @@ if __name__ == '__main__':
                     s[j] = np.sort(s[j])
                 # Construct the exact sampling probabilities.
                 exact = [s[0] * (1 + np.cos(16 * math.pi * s[0])) / 2]
-                exact.append(np.random.uniform(size=(n[1])))
+                exact.append(rng.uniform(size=(n[1])))
                 # Construct weights.
                 weights = []
                 for j in range(2):
@@ -726,10 +838,10 @@ if __name__ == '__main__':
 
             if iex == 3:
                 # Construct scores for the subpopulations.
-                np.random.seed(987654321)
+                rng = default_rng(seed=987654321)
                 s = []
                 for j in range(2):
-                    s.append(np.random.uniform(size=(n[j])))
+                    s.append(rng.uniform(size=(n[j])))
                     if j == 1:
                         s[j] = (1 + (s[j] - .5)**3 / .5**3) / 2
                     else:
@@ -769,10 +881,10 @@ if __name__ == '__main__':
             # avoiding numpy's random number generators
             # that are based on random bits --
             # they yield strange results for many seeds.
-            random.seed(987654321)
+            rng = default_rng(seed=987654321)
             r = []
             for j in range(2):
-                uniform = np.asarray([random.random() for _ in range(n[j])])
+                uniform = np.asarray([rng.random() for _ in range(n[j])])
                 r.append((uniform <= exact[j]).astype(float))
 
             # Generate five plots and a text file reporting metrics.
@@ -804,6 +916,7 @@ if __name__ == '__main__':
             filename = dir + 'equiscores.pdf'
             equiscores(r, s, nbins, filename, weights=weights)
             filename = dir + 'equierrs.pdf'
-            equierrs(r, s, nbins, filename, weights=weights)
+            rng = default_rng(seed=987654321)
+            equierrs(r, s, nbins, rng, filename, weights=weights)
             filename = dir + 'exact.pdf'
             exactplot(exact, s, filename)
