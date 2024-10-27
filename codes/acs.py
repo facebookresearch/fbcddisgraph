@@ -39,6 +39,7 @@ import math
 import numpy as np
 import os
 import shutil
+from numpy.random import default_rng
 
 from disjoint_weighted import equiscores, equierrs, cumulative
 
@@ -208,7 +209,9 @@ for ex in exs:
         filename = dir + 'equiscores' + str(nbins) + '.pdf'
         equiscores(r01, s01, nbins, filename, weights=w01, left=0)
         filename = dir + 'equierrs' + str(nbins) + '.pdf'
-        nout[str(nbins)] = equierrs(r01, s01, nbins, filename, weights=w01)
+        rng = default_rng(seed=987654321)
+        nout[str(nbins)] = equierrs(
+            r01, s01, nbins, rng, filename, weights=w01)
     majorticks = 10
     minorticks = 300
     filename = dir + 'cumulative.pdf'
