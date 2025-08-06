@@ -308,9 +308,9 @@ def equiscore(r, s, nbins, filename='equiscore.pdf'):
             nbin[j] += 1
         # Normalize the sum for each bin to compute the arithmetic average.
         bina = np.divide(bina, nbin, where=nbin != 0)
-        bina[np.where(nbin == 0)] = np.nan
+        bina[nbin == 0] = np.nan
         binb = np.divide(binb, nbin, where=nbin != 0)
-        binb[np.where(nbin == 0)] = np.nan
+        binb[nbin == 0] = np.nan
         return nbin, bina, binb
 
     # Check that the arrays in s are both sorted.
